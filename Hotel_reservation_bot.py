@@ -34,7 +34,8 @@ OUTPUT_DIR = "hotel_data"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 chat_log_path = os.path.join(OUTPUT_DIR, "chat_logs.txt")
 metadata_path = os.path.join(OUTPUT_DIR, "metadata.txt")
-
+BOT_REPLY_DIR="botreplies"
+os.makedirs(BOT_REPLY_DIR, exist_ok=True)
 # API configuration
 os.environ["GROQ_API_KEY"] = ""
 
