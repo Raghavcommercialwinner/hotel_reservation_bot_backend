@@ -24,7 +24,7 @@ ttscounter = 0
 hostname = 'localhost'
 database = 'hoteldb'
 username = 'postgres'
-pwd = ''
+pwd = 'Gautham@123'
 port_id = 5432
 conn = None
 cur = None
@@ -36,7 +36,7 @@ chat_log_path = os.path.join(OUTPUT_DIR, "chat_logs.txt")
 metadata_path = os.path.join(OUTPUT_DIR, "metadata.txt")
 
 # API configuration
-os.environ["GROQ_API_KEY"] = ""
+os.environ["GROQ_API_KEY"] = "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"
 
 def append_to_chat_log(role, message):
     with open(chat_log_path, "a", encoding="utf-8") as f:
@@ -323,7 +323,8 @@ async def audio_chat_endpoint(file: UploadFile = File(...), background_tasks: Ba
         
         return {
             "text": response_text,
-            "audio_url": f"/api/audio/{os.path.basename(speech_file)}"
+            "audio_url": f"/api/audio/{os.path.basename(speech_file)}",
+            "user_transcript": user_input
         }
         
     except Exception as e:
