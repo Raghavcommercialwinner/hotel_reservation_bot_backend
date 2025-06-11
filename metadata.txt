@@ -1,0 +1,121 @@
+the data base has only one table just query this
+
+Table: hotel_booking
+Description
+Stores hotel booking information with strict constraints to ensure data integrity.
+
+Columns
+booking_id
+
+Type: SERIAL
+
+Constraints: PRIMARY KEY
+
+Description: Auto-incrementing unique identifier for each booking.
+
+name
+
+Type: VARCHAR(100)
+
+Constraints: NOT NULL
+
+Description: Customer’s full name.
+
+email
+
+Type: VARCHAR(100)
+
+Constraints: NOT NULL, UNIQUE
+
+Description: Customer’s email address (unique per customer).
+
+phone
+
+Type: VARCHAR(20)
+
+Constraints: NOT NULL
+
+Description: Customer’s phone number.
+
+room_number
+
+Type: VARCHAR(10)
+
+Constraints: NOT NULL, CHECK (room_number IN ('101', '102', '103'))
+
+Description: Room number (allowed values: 101, 102, 103).
+
+room_type
+
+Type: VARCHAR(10)
+
+Constraints: NOT NULL, CHECK (room_type IN ('small', 'medium', 'large'))
+
+Description: Room type (small, medium, or large).
+
+start_time
+
+Type: TIMESTAMP
+
+Constraints: NOT NULL
+
+Description: Booking start date and time.
+
+end_time
+
+Type: TIMESTAMP
+
+Constraints: NOT NULL
+
+Description: Booking end date and time.
+
+total_cost
+
+Type: DECIMAL(10,2)
+
+Constraints: NOT NULL, CHECK (total_cost >= 0)
+
+Description: Total cost of the booking (non-negative).
+
+payment_amount
+
+Type: DECIMAL(10,2)
+
+Constraints: NOT NULL, CHECK (payment_amount > 0)
+
+Description: Amount paid (must be positive).
+
+payment_method
+
+Type: VARCHAR(20)
+
+Constraints: NOT NULL, CHECK (payment_method IN ('credit_card', 'cash', 'online'))
+
+Description: Payment method (credit card, cash, or online).
+
+Key Constraints
+Room-Number-Type Validation:
+
+CHECK ( (room_number = '101' AND room_type = 'small') OR ... )
+
+Ensures:
+
+Room 101 → small
+
+Room 102 → large
+
+Room 103 → medium
+
+Data Integrity:
+
+total_cost must be ≥ 0.
+
+payment_amount must be > 0.
+
+start_time and end_time are required timestamps.
+
+Room 101 → small ->2000
+
+Room 102 → large ->4000
+
+Room 103 → medium->3000
