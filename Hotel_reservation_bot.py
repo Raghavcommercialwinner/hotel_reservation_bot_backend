@@ -24,7 +24,7 @@ ttscounter = 0
 hostname = 'localhost'
 database = 'hoteldb'
 username = 'postgres'
-pwd = 'Gautham@123'
+pwd = ''
 port_id = 5432
 conn = None
 cur = None
@@ -36,7 +36,7 @@ chat_log_path = os.path.join(OUTPUT_DIR, "chat_logs.txt")
 metadata_path = os.path.join(OUTPUT_DIR, "metadata.txt")
 
 # API configuration
-os.environ["GROQ_API_KEY"] = "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"
+os.environ["GROQ_API_KEY"] = ""
 
 def append_to_chat_log(role, message):
     with open(chat_log_path, "a", encoding="utf-8") as f:
