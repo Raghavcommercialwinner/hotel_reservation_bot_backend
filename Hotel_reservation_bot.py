@@ -211,7 +211,7 @@ data_retrieval_agent = Agent(
 - If the user does **not** mention these, do **not** generate any SQL. 
 - and reply with "i am the data retrieval agent"
 - Do **not** retrieve all data; only select data relevant to the user's interest.
-- , include WHERE room_type clauses based on the user's input. (dont use any other selector always only use room type)-without giving any other additional message strictly follow these conditions only
+- , include WHERE room_type clauses based on the user's input. (dont use any other selector always only use room type even if the user gives additional details only use room type (small , medium , large) always be strict about it)-without giving any other additional message strictly follow these conditions only
     Always return your SQL queries inside markdown code blocks using triple backticks with 'sql' specified, like this:
 
 ```sql
@@ -267,24 +267,40 @@ async def chat_endpoint(request: ChatRequest, background_tasks: BackgroundTasks)
     """Handle text input and return audio response"""
     try:
         user_input = request.text
+        if user_input.lower() in ["exit", "quit", "bye","confirm"]:
+            response2 =insert_data("generate insertion/update queries only")
+            llm_response2=response2.choices[0].message.content
+            x=execute_sql_from_response(f"{llm_response2}")
+            response_text = "Goodbye! Have a great day!"
         
+            # Generate speech
+            speech_file = await tts_generate_speech(response_text)
+            
+            # Clean up old files in background
+            background_tasks.add_task(clean_audio_files)
+            
+            return {
+                "text": response_text,
+                "audio_url": f"/api/audio/{os.path.basename(speech_file)}"
+            }
         # Process through existing pipeline
-        data = get_data(user_input)
-        llm_response1 = data.choices[0].message.content
-        data_list = execute_sql_from_response(llm_response1)
-        response = get_response(user_input, data_list)
-        response_text = response.choices[0].message.content
-        
-        # Generate speech
-        speech_file = await tts_generate_speech(response_text)
-        
-        # Clean up old files in background
-        background_tasks.add_task(clean_audio_files)
-        
-        return {
-            "text": response_text,
-            "audio_url": f"/api/audio/{os.path.basename(speech_file)}"
-        }
+        else:
+            data = get_data(user_input)
+            llm_response1 = data.choices[0].message.content
+            data_list = execute_sql_from_response(llm_response1)
+            response = get_response(user_input, data_list)
+            response_text = response.choices[0].message.content
+            
+            # Generate speech
+            speech_file = await tts_generate_speech(response_text)
+            
+            # Clean up old files in background
+            background_tasks.add_task(clean_audio_files)
+            
+            return {
+                "text": response_text,
+                "audio_url": f"/api/audio/{os.path.basename(speech_file)}"
+            }
     except Exception as e:
         raise HTTPException(500, str(e))
 
@@ -308,25 +324,38 @@ async def audio_chat_endpoint(file: UploadFile = File(...), background_tasks: Ba
         with sr.AudioFile(wav_path) as source:
             audio_data = r.record(source)
             user_input = r.recognize_google(audio_data)
-        
-        # Process through AI pipeline
-        data = get_data(user_input)
-        llm_response1 = data.choices[0].message.content
-        data_list = execute_sql_from_response(llm_response1)
-        response = get_response(user_input, data_list)
-        response_text = response.choices[0].message.content
-        
-        # Generate TTS
-        speech_file = await tts_generate_speech(response_text)
-        
-        # Cleanup
-        background_tasks.add_task(clean_audio_files) if background_tasks else None
-        
-        return {
+        if user_input.lower() in ["exit", "quit", "bye","confirm"]:
+            response2 =insert_data("generate insertion/update queries only")
+            llm_response2=response2.choices[0].message.content
+            x=execute_sql_from_response(f"{llm_response2}")
+            response_text = "Goodbye! Have a great day!"
+            speech_file = await tts_generate_speech(response_text)
+            # Clean up old files in background
+            background_tasks.add_task(clean_audio_files)
+            return {
             "text": response_text,
             "audio_url": f"/api/audio/{os.path.basename(speech_file)}",
             "user_transcript": user_input
         }
+        else:
+            # Process through AI pipeline
+            data = get_data(user_input)
+            llm_response1 = data.choices[0].message.content
+            data_list = execute_sql_from_response(llm_response1)
+            response = get_response(user_input, data_list)
+            response_text = response.choices[0].message.content
+            
+            # Generate TTS
+            speech_file = await tts_generate_speech(response_text)
+            
+            # Cleanup
+            background_tasks.add_task(clean_audio_files) if background_tasks else None
+            
+            return {
+                "text": response_text,
+                "audio_url": f"/api/audio/{os.path.basename(speech_file)}",
+                "user_transcript": user_input
+            }
         
     except Exception as e:
         import traceback
